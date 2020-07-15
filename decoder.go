@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"io/ioutil"
+	"strings"
 	"unicode/utf8"
 
 	"golang.org/x/text/encoding/charmap"
@@ -33,6 +34,61 @@ func (d *Win1250Decoder) Decode(in []byte) ([]byte, error) {
 		return nil, err
 	}
 	return data, nil
+}
+
+// KamenickyDecoder translates a Kamenicky DBF to UTF8
+type KamenickyDecoder struct{}
+
+// Decode decodes a Kamenicky byte slice to a UTF8 byte slice
+func (d *KamenickyDecoder) Decode(in []byte) ([]byte, error) {
+	if utf8.Valid(in) {
+		return in, nil
+	}
+	r := transform.NewReader(bytes.NewReader(in), charmap.CodePage437.NewDecoder())
+	data, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	str := string(data)
+
+	for _, v := range [][2]string{
+		{"ě", "ê"},
+		{"ů", "û"},
+		{"ý", "ÿ"},
+		{"č", "ç"},
+		{"ď", "â"},
+		{"ĺ", "ì"},
+		{"ľ", "î"},
+		{"ň", "ñ"},
+		{"ŕ", "¬"},
+		{"ř", "⌐"},
+		{"š", "¿"},
+		{"ť", "ƒ"},
+		{"ž", "æ"},
+		{"Á", "Å"},
+		{"Ě", "ë"},
+		{"Í", "ï"},
+		{"Ó", "ò"},
+		{"Ô", "º"},
+		{"Ú", "ù"},
+		{"Ů", "ª"},
+		{"Ý", "¥"},
+		{"Č", "Ç"},
+		{"Ď", "à"},
+		{"Ĺ", "è"},
+		{"Ľ", "£"},
+		{"Ň", "Ñ"},
+		{"Ŕ", "½"},
+		{"Ř", "₧"},
+		{"Š", "¢"},
+		{"Ť", "å"},
+		{"Ž", "Æ"},
+	} {
+		str = strings.ReplaceAll(str, v[1], v[0])
+	}
+
+	return []byte(str), nil
 }
 
 // UTF8Decoder assumes your DBF is in UTF8 so it does nothing
