@@ -1,8 +1,10 @@
 module github.com/hypertornado/go-foxpro-dbf
 
-go 1.12
+go 1.18
 
 require (
-	github.com/carlosjhr64/jd v0.0.0-20161112153956-c2c3ee56c3e2
-	golang.org/x/text v0.3.2
+	github.com/carlosjhr64/jd v0.0.0-00010101000000-000000000000
+	golang.org/x/text v0.3.3
 )
+
+replace github.com/carlosjhr64/jd => /Users/odchazel/go/src/github.com/hypertornado/go-foxpro-dbf/vendor/github.com/carlosjhr64/jd
