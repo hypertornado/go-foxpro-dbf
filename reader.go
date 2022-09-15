@@ -320,7 +320,6 @@ func (dbf *DBF) Deleted() (bool, error) {
 // Converts raw recorddata to a Record struct.
 // If the data points to a memo (FPT) file this file is also read.
 func (dbf *DBF) bytesToRecord(data []byte) (*Record, error) {
-
 	rec := new(Record)
 
 	// a record should start with te delete flag, a space (0x20) or * (0x2A)
@@ -361,6 +360,10 @@ func (dbf *DBF) fieldDataToValue(raw []byte, fieldpos int) (interface{}, error) 
 		return nil, fmt.Errorf("unsupported fieldtype: %s", dbf.fields[fieldpos].FieldType())
 	case "M":
 		// M values contain the address in the FPT file from where to read data
+
+		//THIS ugly hack fixes some weird path errors of unused fields
+		return "", nil
+
 		memo, isText, err := dbf.parseMemo(raw)
 		if isText {
 			return string(memo), err
@@ -638,13 +641,12 @@ func OpenFile(filename string, dec Decoder) (*DBF, error) {
 // The fptfile parameter is optional, but if the DBF header has the FPT flag set, the fptfile must be provided.
 // The Decoder is used for charset translation to UTF8, see decoder.go
 func OpenStream(dbffile, fptfile ReaderAtSeeker, dec Decoder) (*DBF, error) {
-
 	dbf, err := prepareDBF(dbffile, dec)
 	if err != nil {
 		return nil, err
 	}
 
-	if (dbf.header.TableFlags & 0x02) != 0 {
+	if (dbf.header.TableFlags&0x02) != 0 || true {
 		if fptfile == nil {
 			return nil, ErrNoFPTFile
 		}
