@@ -14,8 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/carlosjhr64/jd"
+	//"github.com/carlosjhr64/jd"
 )
 
 var (
@@ -443,7 +442,7 @@ func (dbf *DBF) parseDateTime(raw []byte) (time.Time, error) {
 	julDat := int(binary.LittleEndian.Uint32(raw[:4]))
 	mSec := int(binary.LittleEndian.Uint32(raw[4:]))
 	// determine year, month, day
-	y, m, d := jd.J2YMD(julDat)
+	y, m, d := J2YMD(julDat)
 	if y < 0 || y > 9999 {
 		// TODO some dbf files seem to contain invalid dates, not sure if we want treat this an error until I know what is going on
 		return time.Time{}, nil
